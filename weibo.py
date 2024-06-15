@@ -5,7 +5,6 @@ import codecs
 import copy
 import csv
 import json
-import logging
 import logging.config
 import math
 import os
@@ -17,7 +16,6 @@ import warnings
 from collections import OrderedDict
 from datetime import date, datetime, timedelta
 from pathlib import Path
-from time import sleep
 
 import requests
 from lxml import etree
@@ -771,32 +769,48 @@ class Weibo(object):
         text_body = weibo_info["text"]
         selector = etree.HTML(f"{text_body}<hr>" if text_body.isspace() else text_body)
         if self.remove_html_tag:
-            text_list = selector.xpath("//text()")
-            # 若text_list中的某个字符串元素以 @ 或 # 开始，则将该元素与前后元素合并为新元素，否则会带来没有必要的换行
-            text_list_modified = []
-            for ele in range(len(text_list)):
-                if ele > 0 and (text_list[ele-1].startswith(('@','#')) or text_list[ele].startswith(('@','#'))):
-                    text_list_modified[-1] += text_list[ele]
-                else:
-                    text_list_modified.append(text_list[ele])
-            weibo["text"] = "\n".join(text_list_modified)
+            try:
+                text_list = selector.xpath("//text()")
+                #若text_list中的某个字符串元素以 @ 或 # 开始，则将该元素与前后元素合并为新元素，否则会带来没有必要的换行
+                text_list_modified = []
+                for ele in range(len(text_list)):
+                    if ele > 0 and (text_list[ele-1].startswith(('@','#')) or text_list[ele].startswith(('@','#'))):
+                        text_list_modified[-1] += text_list[ele]
+                    else:
+                        text_list_modified.append(text_list[ele])
+                weibo["text"] = "\n".join(text_list_modified)
+                for ele in range(len(text_list)):
+                    if ele > 0 and (text_list[ele-1].startswith(('@','#')) or text_list[ele].startswith(('@','#'))):
+                        text_list_modified[-1] += text_list[ele]
+                    else:
+                        text_list_modified.append(text_list[ele])
+                weibo["text"] = "\n".join(text_list_modified)
+            except AttributeError:
+                logger.info("+" * 100)
+                logger.info("+" * 20 +' 没有新的内容 ')
+                logger.info("+" * 100)
+                pass
+
         else:
             weibo["text"] = text_body
-        weibo["article_url"] = self.get_article_url(selector)
-        weibo["pics"] = self.get_pics(weibo_info)
-        weibo["video_url"] = self.get_video_url(weibo_info)
-        weibo["location"] = self.get_location(selector)
-        weibo["created_at"] = weibo_info["created_at"]
-        weibo["source"] = weibo_info["source"]
-        weibo["attitudes_count"] = self.string_to_int(
-            weibo_info.get("attitudes_count", 0)
-        )
-        weibo["comments_count"] = self.string_to_int(
-            weibo_info.get("comments_count", 0)
-        )
-        weibo["reposts_count"] = self.string_to_int(weibo_info.get("reposts_count", 0))
-        weibo["topics"] = self.get_topics(selector)
-        weibo["at_users"] = self.get_at_users(selector)
+        try:
+            weibo["article_url"] = self.get_article_url(selector)
+            weibo["pics"] = self.get_pics(weibo_info)
+            weibo["video_url"] = self.get_video_url(weibo_info)
+            weibo["location"] = self.get_location(selector)
+            weibo["created_at"] = weibo_info["created_at"]
+            weibo["source"] = weibo_info["source"]
+            weibo["attitudes_count"] = self.string_to_int(
+                weibo_info.get("attitudes_count", 0)
+            )
+            weibo["comments_count"] = self.string_to_int(
+                weibo_info.get("comments_count", 0)
+            )
+            weibo["reposts_count"] = self.string_to_int(weibo_info.get("reposts_count", 0))
+            weibo["topics"] = self.get_topics(selector)
+            weibo["at_users"] = self.get_at_users(selector)
+        except AttributeError as e:
+            pass
         return self.standardize_info(weibo)
 
     def print_user_info(self):

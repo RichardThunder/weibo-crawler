@@ -1,6 +1,5 @@
-lxml==4.9.1
-pymongo==3.7.2
-pymysql==1.0.2
-requests==2.31.0
-schedule==1.2.0
-tqdm==4.64.0
+requests~=2.31.0
+numpy~=1.24.3
+lxml~=4.9.1
+tqdm~=4.64.0
+schedule~=1.2.0

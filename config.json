@@ -1,11 +1,12 @@
 {
-    "user_id_list": "user_id_list.txt",
+    "user_id_list": "./weibo/user_id_list.txt",
     "only_crawl_original": 1,
     "since_date": "2010-01-01",
     "start_page": 1,
     "write_mode": [
         "csv"
     ],
+    "schedule_interval": 120,
     "original_pic_download": 1,
     "retweet_pic_download": 0,
     "original_video_download": 1,

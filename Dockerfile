@@ -1,17 +1,8 @@
-# 设置基础镜像
-FROM python
+FROM python:3.8
+LABEL authors="richard"
+WORKDIR ./weibo
+ADD . .
+RUN pip install -r requirements.txt
+CMD ["python","__main__.py"]
 
-# 设置工作目录
-WORKDIR /app
-
-# 复制项目文件到工作目录
-COPY . /app
-
-# 安装依赖包
-RUN pip install --no-cache-dir -r requirements.txt
-
-# 设置循环间隔
-ENV schedule_interval=1
-
-# 运行应用
-CMD python __main__.py $schedule_interval
+#ENTRYPOINT ["top", "-b"]

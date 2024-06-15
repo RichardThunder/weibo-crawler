@@ -1,4 +1,5 @@
 import argparse
+from logging import config
 from time import sleep
 
 import schedule
@@ -6,8 +7,7 @@ import schedule
 import const
 import weibo
 from util.notify import push_deer
-
-
+from weibo import get_config
 def main(schedule_interval):
     """
     主函数，用于设置定时任务和执行微博爬虫脚本。
@@ -35,8 +35,8 @@ def main(schedule_interval):
                 weibo.logger.exception(error)
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument('schedule_interval', type=int, help='循环间隔（分钟）')
-    args = parser.parse_args()
-
-    main(args.schedule_interval)
+    # parser = argparse.ArgumentParser()
+    # parser.add_argument('schedule_interval', type=int, help='循环间隔（分钟）')
+    # args = parser.parse_args()
+    config = get_config()
+    main(config["schedule_interval"])
